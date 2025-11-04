@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // 🔐 Mật khẩu bí mật (đổi nếu muốn)
-  const SECRET_PASSWORD = "Hồng Thơm"; 
+  // 🔐 Mật khẩu bí mật
+  const SECRET_PASSWORD = "Hồng Thơm";
 
-  // 📬 Link Formspree của bạn
+  // 📬 Endpoint Formspree của bạn (đúng form mới)
   const FORMSPREE_ENDPOINT = "https://formspree.io/f/mldoyogr";
 
-  // 🔎 Biến điều khiển
+  // 🧠 Biến điều khiển
   let currentQuestion = 0;
-  const answers = []; // mảng lưu toàn bộ câu trả lời
+  const answers = []; // Mảng lưu toàn bộ câu trả lời
 
   const questions = document.querySelectorAll('.question');
   const introScreen = document.getElementById('intro-screen');
@@ -17,22 +17,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // 💌 Ghi lại câu trả lời
   function recordAnswer(question, answer) {
     answers.push({
-      "Câu hỏi": question,
-      "Câu trả lời": answer
+      question: question,
+      answer: answer
     });
   }
 
   // 📨 Gửi tất cả câu trả lời qua Formspree
   async function sendAllToFormspree() {
     const data = {
-      "Tất cả câu trả lời": answers,
-      "Thời gian gửi": new Date().toLocaleString()
+      answers: answers,
+      sent_at: new Date().toLocaleString()
     };
+
+    console.log("📤 Đang gửi dữ liệu lên Formspree...", data);
 
     try {
       const response = await fetch(FORMSPREE_ENDPOINT, {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
@@ -45,12 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("⚠️ Gửi thất bại:", response.statusText);
       }
     } catch (err) {
-      console.error("❌ Lỗi mạng:", err);
+      console.error("❌ Lỗi mạng hoặc lỗi khác:", err);
     }
   }
 
   // 👉 Chuyển sang câu hỏi tiếp theo
-  window.nextQuestion = function() {
+  window.nextQuestion = function () {
     // Nếu đang ở màn hình intro
     if (currentQuestion === 0) {
       introScreen.classList.add('hidden');
@@ -76,12 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Hiện câu tiếp theo
+    // Hiện câu hỏi tiếp theo
     if (currentQuestion < questions.length) {
       questions[currentQuestion].classList.remove('hidden');
       currentQuestion++;
     }
-  }
+  };
 
   // 🧠 Khi người dùng chọn 1 nút (❤️, Có/Không,…)
   document.querySelectorAll('.question button').forEach(btn => {
@@ -92,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 🔐 Kiểm tra mật khẩu ở bước cuối
-  window.checkPassword = function() {
+  window.checkPassword = function () {
     const passwordInput = document.getElementById('password-input');
     const feedbackMessage = document.getElementById('feedback-message');
     const input = passwordInput.value.trim();
@@ -105,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       recordAnswer("Kết quả mở khóa", "✅ Nhập đúng mật khẩu");
 
-      // Gửi tất cả dữ liệu khi kết thúc
+      // 📨 Gửi tất cả dữ liệu khi hoàn tất
       sendAllToFormspree();
     } else {
       feedbackMessage.textContent = "Sai mật khẩu rồi, em thử lại nhé!";
@@ -115,6 +117,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
       recordAnswer("Kết quả mở khóa", "❌ Sai mật khẩu");
     }
-  }
+  };
 });
-
