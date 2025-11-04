@@ -1,132 +1,124 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const yesBtn = document.getElementById('yesBtn');
-    const noBtn = document.getElementById('noBtn');
-    const retryMessage = document.getElementById('retryMessage');
-    const thankYouMessage = document.getElementById('thankYouMessage');
-    const fireworksContainer = document.querySelector('.fireworks-container');
-    const question = document.querySelector('.question');
-    const title = document.querySelector('h1');
-    const buttonsDiv = document.querySelector('.buttons');
+  const SECRET_PASSWORD = "Hồng Thơm"; // mật khẩu đúng
+  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xqabdvlg"; // link formspree
 
-    // **THAY THẾ ĐƯỜNG LINK NÀY BẰNG ENDPOINT URL CỦA FORMSPREE CỦA BẠN**
-    const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xqabdvlg'; 
-    // Ví dụ: const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mleazwqa';
+  let currentQuestion = 0;
+  const questions = document.querySelectorAll('.question');
+  const introScreen = document.getElementById('intro-screen');
+  const questionsContainer = document.getElementById('questions-container');
+  const apologyMessageScreen = document.getElementById('apology-message-screen');
 
-    let heartsInterval;
-    let bubblesInterval;
+  // Hàm gửi dữ liệu qua Formspree
+  async function sendToFormspree(data) {
+    try {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+      if (response.ok) {
+        console.log("✅ Gửi dữ liệu thành công đến Formspree:", data);
+      } else {
+        console.error("⚠️ Gửi thất bại:", response.statusText);
+      }
+    } catch (err) {
+      console.error("❌ Lỗi mạng khi gửi Formspree:", err);
+    }
+  }
 
-    // Hàm gửi dữ liệu đến Formspree
-    async function sendChoiceToFormspree(choice) {
-        try {
-            const response = await fetch(FORMSPREE_ENDPOINT, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json' // Quan trọng để nhận phản hồi JSON từ Formspree
-                },
-                body: JSON.stringify({
-                    'lựa chọn': choice, // Tên trường bạn muốn thấy trong email
-                    'thời gian': new Date().toLocaleString() // Thêm thời gian lựa chọn
-                })
-            });
-
-            if (response.ok) {
-                console.log('Lựa chọn đã được gửi thành công!');
-                // Bạn có thể thêm xử lý thành công ở đây nếu muốn
-            } else {
-                console.error('Có lỗi khi gửi lựa chọn:', response.statusText);
-                // Xử lý lỗi nếu cần
-            }
-        } catch (error) {
-            console.error('Lỗi mạng hoặc lỗi khác:', error);
-        }
+  // Chuyển sang câu hỏi tiếp theo
+  function nextQuestion() {
+    if (currentQuestion === 0) {
+      introScreen.classList.add('hidden');
+      questionsContainer.classList.remove('hidden');
+    } else {
+      questions[currentQuestion - 1].classList.add('hidden');
     }
 
+    if (currentQuestion < questions.length) {
+      questions[currentQuestion].classList.remove('hidden');
+      currentQuestion++;
+    }
+  }
 
-    // Xử lý khi nhấn nút "Không"
-    noBtn.addEventListener('click', () => {
-        // Gửi lựa chọn "Không" đến Formspree
-        sendChoiceToFormspree('Không');
+  // Kiểm tra mật khẩu
+  window.checkPassword = function() {
+    const passwordInput = document.getElementById('password-input');
+    const feedbackMessage = document.getElementById('feedback-message');
+    const input = passwordInput.value.trim();
 
-        // Hiện thông báo "Vui lòng chọn lại"
-        retryMessage.classList.remove('hidden');
-
-        // Làm nút "Có" lớn hơn
-        let currentYesFontSize = parseFloat(window.getComputedStyle(yesBtn).fontSize);
-        yesBtn.style.fontSize = (currentYesFontSize * 1.2) + 'px';
-        yesBtn.style.padding = (parseFloat(window.getComputedStyle(yesBtn).paddingTop) * 1.2) + 'px ' + (parseFloat(window.getComputedStyle(yesBtn).paddingLeft) * 1.2) + 'px';
+    // Gửi dữ liệu nhập tên đến Formspree
+    sendToFormspree({
+      "Câu": "Nhập mật khẩu mở lời xin lỗi",
+      "Giá trị nhập": input,
+      "Thời gian": new Date().toLocaleString()
     });
 
-    // Xử lý khi nhấn nút "Có"
-    yesBtn.addEventListener('click', () => {
-        // Gửi lựa chọn "Có" đến Formspree
-        sendChoiceToFormspree('Có');
+    if (input.toLowerCase() === SECRET_PASSWORD.toLowerCase()) {
+      questionsContainer.classList.add('hidden');
+      apologyMessageScreen.classList.remove('hidden');
 
-        // Ẩn tất cả các phần tử khác
-        question.classList.add('hidden');
-        buttonsDiv.classList.add('hidden');
-        retryMessage.classList.add('hidden');
-        title.classList.add('hidden');
+      // Gửi thông tin “Đã mở khóa thành công”
+      sendToFormspree({
+        "Trạng thái": "✅ Nhập đúng mật khẩu",
+        "Tên nhập": input,
+        "Thời gian": new Date().toLocaleString()
+      });
+    } else {
+      feedbackMessage.textContent = "Sai mật khẩu rồi, em thử lại nhé!";
+      feedbackMessage.classList.remove('hidden');
+      feedbackMessage.classList.remove('text-green-600');
+      feedbackMessage.classList.add('text-red-600');
 
-        // Hiện thông báo "Cảm ơn"
-        thankYouMessage.classList.remove('hidden');
+      // Gửi thông tin “Sai mật khẩu”
+      sendToFormspree({
+        "Trạng thái": "❌ Sai mật khẩu",
+        "Tên nhập": input,
+        "Thời gian": new Date().toLocaleString()
+      });
+    }
+  }
 
-        // Bắt đầu tạo hiệu ứng trái tim và bong bóng
-        startLoveEffects();
+  // Ghi lại các lựa chọn của người chơi
+  window.nextQuestion = function() {
+    // Nếu đang ở câu hỏi nhập text
+    if (currentQuestion === 3) {
+      const text = document.getElementById('apology-wish').value.trim();
+      if (text) {
+        sendToFormspree({
+          "Câu": "Em muốn anh làm gì để bù đắp?",
+          "Câu trả lời": text,
+          "Thời gian": new Date().toLocaleString()
+        });
+      }
+    }
+
+    // Gửi thông tin lựa chọn trước đó (nếu có)
+    if (currentQuestion > 0 && currentQuestion <= questions.length) {
+      const prevQuestion = questions[currentQuestion - 1];
+      const selectedButton = prevQuestion.querySelector('button.active');
+      if (selectedButton) {
+        sendToFormspree({
+          "Câu hỏi": prevQuestion.querySelector('h2').innerText,
+          "Lựa chọn": selectedButton.innerText,
+          "Thời gian": new Date().toLocaleString()
+        });
+      }
+    }
+
+    // Tiếp tục tới câu tiếp theo
+    nextQuestion();
+  }
+
+  // Khi click nút chọn trong các câu hỏi
+  document.querySelectorAll('.question button').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      // đánh dấu nút được chọn
+      e.target.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
     });
-
-    // Hàm bắt đầu hiệu ứng trái tim rơi và bong bóng bay
-    function startLoveEffects() {
-        clearInterval(heartsInterval);
-        clearInterval(bubblesInterval);
-
-        heartsInterval = setInterval(() => {
-            createFallingHeart();
-        }, 200);
-
-        bubblesInterval = setInterval(() => {
-            createBubble();
-        }, 150);
-    }
-
-    // Hàm tạo trái tim rơi
-    function createFallingHeart() {
-        const heart = document.createElement('div');
-        heart.classList.add('falling-heart');
-        fireworksContainer.appendChild(heart);
-
-        const size = Math.random() * 25 + 15;
-        heart.style.width = `${size}px`;
-        heart.style.height = `${size}px`;
-        heart.style.left = `${Math.random() * 100}%`;
-        heart.style.animationDuration = `${Math.random() * 3 + 2}s`;
-        heart.style.animationDelay = `${Math.random() * 0.5}s`;
-
-        heart.addEventListener('animationend', () => {
-            heart.remove();
-        });
-    }
-
-    // Hàm tạo bong bóng bay lên
-    function createBubble() {
-        const bubble = document.createElement('div');
-        bubble.classList.add('bubble');
-        fireworksContainer.appendChild(bubble);
-
-        const size = Math.random() * 30 + 20;
-        bubble.style.width = `${size}px`;
-        bubble.style.height = `${size}px`;
-        bubble.style.left = `${Math.random() * 100}%`;
-        bubble.style.bottom = `-50px`;
-
-        const translateXEnd = (Math.random() - 0.5) * 200;
-        bubble.style.setProperty('--translateX-end', `${translateXEnd}px`);
-
-        bubble.style.animationDuration = `${Math.random() * 5 + 3}s`;
-        bubble.style.animationDelay = `${Math.random() * 0.5}s`;
-
-        bubble.addEventListener('animationend', () => {
-            bubble.remove();
-        });
-    }
+  });
 });
