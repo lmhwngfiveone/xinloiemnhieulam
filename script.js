@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const SECRET_PASSWORD = "Hồng Thơm"; // mật khẩu đúng
-  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xqabdvlg"; // link formspree
+  const SECRET_PASSWORD = "Hồng Thơm"; 
+  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xqabdvlg"; // đổi nếu bạn có endpoint khác
 
   let currentQuestion = 0;
   const questions = document.querySelectorAll('.question');
@@ -11,26 +11,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // Hàm gửi dữ liệu qua Formspree
   async function sendToFormspree(data) {
     try {
-      const response = await fetch(FORMSPREE_ENDPOINT, {
+      await fetch(FORMSPREE_ENDPOINT, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify(data)
       });
-      if (response.ok) {
-        console.log("✅ Gửi dữ liệu thành công đến Formspree:", data);
-      } else {
-        console.error("⚠️ Gửi thất bại:", response.statusText);
-      }
     } catch (err) {
-      console.error("❌ Lỗi mạng khi gửi Formspree:", err);
+      console.error("Không gửi được:", err);
     }
   }
 
-  // Chuyển sang câu hỏi tiếp theo
-  function nextQuestion() {
+  // Hiển thị câu hỏi kế tiếp
+  window.nextQuestion = function() {
     if (currentQuestion === 0) {
       introScreen.classList.add('hidden');
       questionsContainer.classList.remove('hidden');
@@ -38,11 +30,40 @@ document.addEventListener('DOMContentLoaded', () => {
       questions[currentQuestion - 1].classList.add('hidden');
     }
 
+    // Ghi nhận dữ liệu của câu trước (nếu có)
+    if (currentQuestion > 0 && currentQuestion <= questions.length) {
+      const prevQuestion = questions[currentQuestion - 1];
+      const h2 = prevQuestion.querySelector('h2');
+      const textInput = prevQuestion.querySelector('textarea');
+      const selected = prevQuestion.querySelector('button.selected');
+
+      let answer = "";
+      if (textInput) answer = textInput.value.trim();
+      else if (selected) answer = selected.innerText;
+
+      if (answer) {
+        sendToFormspree({
+          "Câu hỏi": h2 ? h2.innerText : "Không rõ",
+          "Câu trả lời": answer,
+          "Thời gian": new Date().toLocaleString()
+        });
+      }
+    }
+
+    // Chuyển sang câu hỏi tiếp theo
     if (currentQuestion < questions.length) {
       questions[currentQuestion].classList.remove('hidden');
       currentQuestion++;
     }
   }
+
+  // Khi bấm chọn đáp án
+  document.querySelectorAll('.question button').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.target.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+      e.target.classList.add('selected');
+    });
+  });
 
   // Kiểm tra mật khẩu
   window.checkPassword = function() {
@@ -50,10 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackMessage = document.getElementById('feedback-message');
     const input = passwordInput.value.trim();
 
-    // Gửi dữ liệu nhập tên đến Formspree
     sendToFormspree({
-      "Câu": "Nhập mật khẩu mở lời xin lỗi",
-      "Giá trị nhập": input,
+      "Câu hỏi": "Mật khẩu mở lời xin lỗi",
+      "Câu trả lời": input,
       "Thời gian": new Date().toLocaleString()
     });
 
@@ -61,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
       questionsContainer.classList.add('hidden');
       apologyMessageScreen.classList.remove('hidden');
 
-      // Gửi thông tin “Đã mở khóa thành công”
       sendToFormspree({
         "Trạng thái": "✅ Nhập đúng mật khẩu",
         "Tên nhập": input,
@@ -72,53 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
       feedbackMessage.classList.remove('hidden');
       feedbackMessage.classList.remove('text-green-600');
       feedbackMessage.classList.add('text-red-600');
-
-      // Gửi thông tin “Sai mật khẩu”
-      sendToFormspree({
-        "Trạng thái": "❌ Sai mật khẩu",
-        "Tên nhập": input,
-        "Thời gian": new Date().toLocaleString()
-      });
     }
   }
-
-  // Ghi lại các lựa chọn của người chơi
-  window.nextQuestion = function() {
-    // Nếu đang ở câu hỏi nhập text
-    if (currentQuestion === 3) {
-      const text = document.getElementById('apology-wish').value.trim();
-      if (text) {
-        sendToFormspree({
-          "Câu": "Em muốn anh làm gì để bù đắp?",
-          "Câu trả lời": text,
-          "Thời gian": new Date().toLocaleString()
-        });
-      }
-    }
-
-    // Gửi thông tin lựa chọn trước đó (nếu có)
-    if (currentQuestion > 0 && currentQuestion <= questions.length) {
-      const prevQuestion = questions[currentQuestion - 1];
-      const selectedButton = prevQuestion.querySelector('button.active');
-      if (selectedButton) {
-        sendToFormspree({
-          "Câu hỏi": prevQuestion.querySelector('h2').innerText,
-          "Lựa chọn": selectedButton.innerText,
-          "Thời gian": new Date().toLocaleString()
-        });
-      }
-    }
-
-    // Tiếp tục tới câu tiếp theo
-    nextQuestion();
-  }
-
-  // Khi click nút chọn trong các câu hỏi
-  document.querySelectorAll('.question button').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      // đánh dấu nút được chọn
-      e.target.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-      e.target.classList.add('active');
-    });
-  });
 });
