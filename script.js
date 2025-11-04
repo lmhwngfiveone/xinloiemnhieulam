@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const SECRET_PASSWORD = "Hồng Thơm"; 
 
   // 📬 Link Formspree của bạn
-  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xqagvyrr";
+  const FORMSPREE_ENDPOINT = "https://formspree.io/f/mldoyogr";
 
   // 🔎 Biến điều khiển
   let currentQuestion = 0;
@@ -117,3 +117,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+
