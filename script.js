@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   const SECRET_PASSWORD = "Hồng Thơm"; 
-  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xqabdvlg"; // đổi nếu bạn có endpoint khác
+  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xqagvyrr"; // đổi nếu bạn có endpoint khác
 
   let currentQuestion = 0;
   const questions = document.querySelectorAll('.question');
@@ -94,3 +94,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+
