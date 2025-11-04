@@ -1,0 +1,217 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #fce4ec; /* Màu hồng nhạt */
+    color: #4a148c; /* Màu tím đậm */
+    text-align: center;
+    overflow: hidden; /* Ngăn cuộn trang khi pháo hoa */
+}
+
+.container {
+    background-color: #fff;
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 90%;
+    position: relative; /* Quan trọng cho pháo hoa */
+    z-index: 10; /* Đảm bảo nội dung hiển thị trên pháo hoa */
+}
+
+h1 {
+    color: #d81b60; /* Màu hồng đậm */
+    margin-bottom: 20px;
+    font-size: 2.2em;
+}
+
+.question {
+    font-size: 1.8em;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #880e4f; /* Màu tím hồng */
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+button {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+button.yes {
+    background-color: #4CAF50; /* Xanh lá cây */
+    color: white;
+}
+
+button.yes:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+}
+
+button.no {
+    background-color: #f44336; /* Đỏ */
+    color: white;
+}
+
+button.no:hover {
+    background-color: #da190b;
+    transform: scale(1.05);
+}
+
+#retryMessage {
+    color: #f44336;
+    font-weight: bold;
+    margin-top: 20px;
+    font-size: 1.1em;
+}
+
+#thankYouMessage {
+    color: #4CAF50;
+    font-weight: bold;
+    margin-top: 20px;
+    font-size: 2em;
+    animation: fadeIn 2s ease-in-out;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Hiệu ứng pháo hoa và trái tim */
+.fireworks-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 5; /* Dưới nội dung */
+    pointer-events: none; /* Cho phép click xuyên qua */
+}
+
+.heart {
+    position: absolute;
+    background-color: red;
+    transform: rotate(-45deg);
+    width: 20px;
+    height: 20px;
+    animation: flyUp 3s forwards, beat 0.8s infinite;
+    opacity: 0;
+}
+
+.heart::before,
+.heart::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    border-radius: 50%;
+}
+
+.heart::before {
+    top: -10px;
+    left: 0;
+}
+
+.heart::after {
+    top: 0;
+    left: 10px;
+}
+
+/* Keyframes cho hiệu ứng */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes flyUp {
+    0% { opacity: 1; transform: translateY(0) rotate(-45deg); }
+    100% { opacity: 0; transform: translateY(-500px) rotate(-45deg); }
+}
+
+@keyframes beat {
+    0%, 100% { transform: scale(1) rotate(-45deg); }
+    50% { transform: scale(1.1) rotate(-45deg); }
+}
+/* ... (Giữ nguyên các đoạn CSS đã có) ... */
+
+/* Thêm kiểu cho bong bóng */
+.bubble {
+    position: absolute;
+    background-color: rgba(173, 216, 230, 0.7); /* LightBlue với độ trong suốt */
+    border-radius: 50%;
+    animation: bubbleUp linear infinite;
+    pointer-events: none; /* Không cản trở sự kiện chuột */
+    box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5); /* Hiệu ứng ánh sáng */
+}
+
+/* Thêm kiểu cho trái tim rơi */
+.falling-heart {
+    position: absolute;
+    background-color: red;
+    transform: rotate(-45deg);
+    width: 20px;
+    height: 20px;
+    animation: fallDown linear infinite;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.falling-heart::before,
+.falling-heart::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    border-radius: 50%;
+}
+
+.falling-heart::before {
+    top: -10px;
+    left: 0;
+}
+
+.falling-heart::after {
+    top: 0;
+    left: 10px;
+}
+
+/* Keyframes cho hiệu ứng bong bóng bay lên */
+@keyframes bubbleUp {
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-100vh) translateX(var(--translateX-end));
+        opacity: 0;
+    }
+}
+
+/* Keyframes cho hiệu ứng trái tim rơi xuống */
+@keyframes fallDown {
+    0% {
+        transform: translateY(-100px) rotate(-45deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(-45deg);
+        opacity: 0;
+    }
+}

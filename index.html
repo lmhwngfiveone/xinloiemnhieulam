@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💌 Trò chơi xin lỗi bạn gái</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7e9f7;
+        }
+        .container {
+            max-width: 600px;
+            min-height: 500px;
+            background-color: #ffffff;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .heart-icon {
+            font-size: 3rem;
+            transition: transform 0.2s;
+        }
+        .heart-icon:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="container rounded-2xl p-6 md:p-10 text-center flex flex-col justify-between">
+        <!-- Tiêu đề và mô tả -->
+        <div id="intro-screen">
+            <h1 class="text-4xl md:text-5xl font-bold text-pink-500 mb-4 animate-pulse">
+                💌 "Anh xin lỗi, chơi game này với anh nha?"
+            </h1>
+            <p class="text-gray-600 text-lg md:text-xl leading-relaxed">
+                "Anh biết mình đã làm em buồn 😔. Anh tạo trò chơi này để xin lỗi em và làm em cười lại. Em chơi với anh nha ❤️."
+            </p>
+            <button onclick="nextQuestion()" class="mt-8 px-8 py-4 bg-pink-500 text-white font-bold rounded-full shadow-lg hover:bg-pink-600 transition duration-300 transform hover:scale-105">
+                Bắt đầu
+            </button>
+        </div>
+
+        <!-- Màn hình câu hỏi -->
+        <div id="questions-container" class="hidden">
+            <!-- Câu hỏi 1 -->
+            <div id="question-1" class="question">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+                    👉 Em có đang giận anh không?
+                </h2>
+                <div class="flex flex-col space-y-4">
+                    <button onclick="nextQuestion()" class="px-6 py-4 bg-white text-gray-700 font-medium rounded-xl shadow-md border-2 border-pink-200 hover:bg-pink-100 transition duration-200">
+                        Có 😡
+                    </button>
+                    <button onclick="nextQuestion()" class="px-6 py-4 bg-white text-gray-700 font-medium rounded-xl shadow-md border-2 border-pink-200 hover:bg-pink-100 transition duration-200">
+                        Chưa chắc 😐
+                    </button>
+                    <button onclick="nextQuestion()" class="px-6 py-4 bg-white text-gray-700 font-medium rounded-xl shadow-md border-2 border-pink-200 hover:bg-pink-100 transition duration-200">
+                        Không, tại anh dễ thương 😘
+                    </button>
+                </div>
+            </div>
+
+            <!-- Câu hỏi 2 -->
+            <div id="question-2" class="question hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+                    👉 Chọn trái tim nào là cảm xúc của em lúc này?
+                </h2>
+                <div class="flex justify-around items-center">
+                    <button onclick="nextQuestion()" class="heart-icon">❤️</button>
+                    <button onclick="nextQuestion()" class="heart-icon">💖</button>
+                    <button onclick="nextQuestion()" class="heart-icon">💔</button>
+                    <button onclick="nextQuestion()" class="heart-icon">💘</button>
+                </div>
+            </div>
+
+            <!-- Câu hỏi 3 -->
+            <div id="question-3" class="question hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+                    👉 Em muốn anh làm gì để bù đắp?
+                </h2>
+                <textarea id="apology-wish" class="w-full h-32 p-4 border-2 border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 resize-none" placeholder="Hãy nói ra những gì em muốn..."></textarea>
+                <button onclick="nextQuestion()" class="mt-6 px-8 py-4 bg-pink-500 text-white font-bold rounded-full shadow-lg hover:bg-pink-600 transition duration-300">
+                    Tiếp theo
+                </button>
+            </div>
+            
+            <!-- Câu hỏi 5 (Mini-game mật khẩu) -->
+            <div id="question-5" class="question hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+                    👉 Em hãy nhập mật khẩu để mở lời xin lỗi bí mật
+                </h2>
+                <p class="text-gray-500 text-sm mb-4">Gợi ý: Mật khẩu là tên em ❤️</p>
+                <input type="text" id="password-input" class="w-2/3 md:w-1/2 px-4 py-3 text-center border-2 border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400" placeholder="Nhập tên em">
+                <div id="feedback-message" class="mt-4 text-sm font-semibold hidden"></div>
+                <button onclick="checkPassword()" class="mt-6 px-8 py-4 bg-pink-500 text-white font-bold rounded-full shadow-lg hover:bg-pink-600 transition duration-300">
+                    Mở khóa
+                </button>
+            </div>
+        </div>
+
+        <!-- Màn hình lời xin lỗi cuối cùng -->
+        <div id="apology-message-screen" class="hidden">
+            <h2 class="text-4xl font-bold text-pink-500 mb-6 animate-pulse">
+                💌 Anh xin lỗi!
+            </h2>
+            <p class="text-gray-700 text-xl leading-relaxed">
+                "Anh xin lỗi vì đã làm em buồn. Anh hứa sẽ không tái phạm và sẽ yêu em nhiều hơn nữa. Em tha lỗi cho anh nha ❤️."
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Mật khẩu bí mật. Bạn có thể thay đổi "Tên em" thành tên của bạn gái nhé!
+        const SECRET_PASSWORD = "Hồng Thơm"; 
+        
+        let currentQuestion = 0;
+        const questions = document.querySelectorAll('.question');
+        const introScreen = document.getElementById('intro-screen');
+        const questionsContainer = document.getElementById('questions-container');
+        const apologyMessageScreen = document.getElementById('apology-message-screen');
+
+        function nextQuestion() {
+            // Ẩn màn hình hiện tại
+            if (currentQuestion === 0) {
+                introScreen.classList.add('hidden');
+                questionsContainer.classList.remove('hidden');
+            } else {
+                questions[currentQuestion - 1].classList.add('hidden');
+            }
+
+            // Hiển thị câu hỏi tiếp theo
+            if (currentQuestion < questions.length) {
+                questions[currentQuestion].classList.remove('hidden');
+                currentQuestion++;
+            }
+        }
+
+        function checkPassword() {
+            const passwordInput = document.getElementById('password-input');
+            const feedbackMessage = document.getElementById('feedback-message');
+            
+            // Xóa bỏ khoảng trắng và chuyển về chữ thường để so sánh
+            const input = passwordInput.value.trim();
+            
+            if (input.toLowerCase() === SECRET_PASSWORD.toLowerCase()) {
+                // Mật khẩu đúng
+                questionsContainer.classList.add('hidden');
+                apologyMessageScreen.classList.remove('hidden');
+            } else {
+                // Mật khẩu sai
+                feedbackMessage.textContent = "Sai mật khẩu rồi, em thử lại nhé!";
+                feedbackMessage.classList.remove('hidden');
+                feedbackMessage.classList.remove('text-green-600');
+                feedbackMessage.classList.add('text-red-600');
+            }
+        }
+    </script>
+</body>
+</html>
